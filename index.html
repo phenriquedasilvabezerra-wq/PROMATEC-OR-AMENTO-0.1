@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 Planilha de Projeção - Implantação de Filial | PROMATEC</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+
+    :root{
+        --verde:#7CB342;
+        --verde-neon:#8BC34A;
+        --verde-escuro:#4CAF50;
+        --azul:#29B6F6;
+        --azul-escuro:#039BE5;
+        --bg-1:#0A1420;
+        --bg-2:#0D1B2A;
+        --card:#12202E;
+        --card-hover:#16273A;
+        --borda:#1E3040;
+        --texto:#E0E0E0;
+        --texto-suave:#8FA3B8;
+        --grad:linear-gradient(135deg,#8BC34A 0%,#29B6F6 100%);
+    }
+
+    body{
+        background:radial-gradient(circle at top left,#0D1B2A 0%,#0A1420 60%,#050B12 100%);
+        padding:30px 20px; display:flex; justify-content:center; min-height:100vh; color:var(--texto);
+    }
+
+    .container{
+        max-width:1200px; width:100%;
+        background:linear-gradient(180deg,#0F1E2D 0%,#0A1622 100%);
+        border-radius:24px; padding:30px 35px 45px;
+        box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(41,182,246,.08);
+        border:1px solid var(--borda);
+    }
+
+    /* CABEÇALHO */
+    .header{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;
+        margin-bottom:20px; border-bottom:2px solid var(--borda); padding-bottom:18px; gap:15px; }
+    .header-left{ flex:1; min-width:250px; }
+    .header-left h1{ font-size:28px; font-weight:700; color:#fff; display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .header-left h1 span{ background:var(--grad); color:#06210A; font-size:13px; font-weight:700;
+        padding:4px 14px; border-radius:30px; margin-left:8px; letter-spacing:.05em; text-transform:uppercase; }
+
+    .dados-filial{ display:flex; flex-wrap:wrap; gap:15px 25px; background:var(--card);
+        padding:12px 20px; border-radius:16px; border:1px solid var(--borda); }
+    .dados-filial .campo{ display:flex; align-items:center; gap:8px; }
+    .dados-filial .campo label{ font-weight:600; color:var(--azul); font-size:14px; white-space:nowrap; }
+    .dados-filial .campo input{ padding:8px 14px; border:1px solid var(--borda); border-radius:10px;
+        font-size:14px; background:#0A1622; color:#fff; outline:none; transition:.2s; min-width:150px; }
+    .dados-filial .campo input:focus{ border-color:var(--verde-neon); box-shadow:0 0 0 3px rgba(139,195,74,.18); }
+    .dados-filial .campo input#nomeFilial{ min-width:200px; }
+    .dados-filial .campo input#numeroFilial{ min-width:80px; max-width:120px; }
+
+    .header-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .btn-acao{ padding:10px 20px; border:none; border-radius:40px; font-weight:600; font-size:14px;
+        cursor:pointer; transition:.25s; display:flex; align-items:center; gap:8px; white-space:nowrap; }
+    .btn-imprimir{ background:var(--azul-escuro); color:#fff; }
+    .btn-imprimir:hover{ background:var(--azul); transform:scale(1.02); box-shadow:0 4px 16px rgba(41,182,246,.4); }
+    .btn-salvar{ background:var(--verde-escuro); color:#06210A; }
+    .btn-salvar:hover{ background:var(--verde-neon); transform:scale(1.02); box-shadow:0 4px 16px rgba(124,179,66,.45); }
+    .btn-carregar{ background:transparent; color:var(--verde-neon); border:1.5px solid var(--verde-neon); }
+    .btn-carregar:hover{ background:var(--verde-neon); color:#06210A; transform:scale(1.02); }
+
+    .total-geral{ background:var(--grad); color:#06210A; padding:12px 28px; border-radius:60px;
+        font-weight:800; font-size:20px; box-shadow:0 6px 24px rgba(41,182,246,.35); white-space:nowrap; }
+    .total-geral small{ font-weight:600; font-size:13px; opacity:.85; letter-spacing:.04em; }
+
+    /* RESUMO RÁPIDO */
+    .resumo-rapido{ display:flex; flex-wrap:wrap; gap:12px 20px; background:rgba(41,182,246,.06);
+        padding:10px 20px; border-radius:14px; margin-bottom:20px; border:1px solid rgba(41,182,246,.2); }
+    .resumo-rapido .item{ font-size:14px; font-weight:500; color:var(--texto-suave); }
+    .resumo-rapido .item span{ font-weight:700; color:var(--verde-neon); }
+
+    /* ABAS */
+    .tabs{ display:flex; gap:6px; margin-bottom:28px; flex-wrap:wrap; }
+    .tab-btn{ padding:12px 26px; background:var(--card); border:1px solid var(--borda); border-radius:40px;
+        font-weight:600; font-size:15px; color:var(--texto-suave); cursor:pointer; transition:.25s;
+        display:flex; align-items:center; gap:8px; }
+    .tab-btn i{ font-style:normal; font-size:18px; }
+    .tab-btn:hover{ background:var(--card-hover); color:var(--texto); border-color:rgba(41,182,246,.35); }
+    .tab-btn.active{ background:var(--grad); color:#06210A; border-color:transparent; box-shadow:0 6px 18px rgba(41,182,246,.35); }
+
+    /* PAINÉIS */
+    .tab-panel{ display:none; animation:fadeIn .35s ease; }
+    .tab-panel.active{ display:block; }
+    @keyframes fadeIn{ 0%{opacity:.5; transform:translateY(8px);} 100%{opacity:1; transform:translateY(0);} }
+
+    /* CARDS GENÉRICOS */
+    .card-grid,.pub-grid,.reforma-grid,.eletrica-grid{
+        display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px 22px; margin-top:8px; }
+    .campo-card,.pub-card,.reforma-card,.eletrica-card{
+        background:var(--card); padding:16px 18px 18px; border-radius:18px; border:1px solid var(--borda); transition:.2s; }
+    .campo-card:hover,.pub-card:hover,.reforma-card:hover,.eletrica-card:hover{
+        border-color:var(--verde); background:var(--card-hover); box-shadow:0 4px 20px rgba(124,179,66,.12); }
+    .campo-card label,.pub-card label,.reforma-card label,.eletrica-card label{
+        display:block; font-weight:600; color:var(--azul); font-size:14px; margin-bottom:6px; letter-spacing:.02em; }
+    .campo-card input,.pub-card input,.reforma-card input,.eletrica-card input{
+        width:100%; padding:12px 14px; border:1px solid var(--borda); border-radius:14px; font-size:15px;
+        background:#0A1622; color:#fff; transition:.2s; outline:none; font-weight:500; }
+    .campo-card input:focus,.pub-card input:focus,.reforma-card input:focus,.eletrica-card input:focus{
+        border-color:var(--verde-neon); box-shadow:0 0 0 3px rgba(139,195,74,.18); }
+    .campo-card input[type="number"],.pub-card input[type="number"],
+    .reforma-card input[type="number"],.eletrica-card input[type="number"]{ -moz-appearance:textfield; }
+    .campo-card input[type="number"]::-webkit-outer-spin-button,
+    .campo-card input[type="number"]::-webkit-inner-spin-button,
+    .pub-card input[type="number"]::-webkit-outer-spin-button,
+    .pub-card input[type="number"]::-webkit-inner-spin-button,
+    .reforma-card input[type="number"]::-webkit-outer-spin-button,
+    .reforma-card input[type="number"]::-webkit-inner-spin-button,
+    .eletrica-card input[type="number"]::-webkit-outer-spin-button,
+    .eletrica-card input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; }
+
+    .campo-card .total-item{ margin-top:8px; font-size:14px; font-weight:600; color:#06210A;
+        background:var(--grad); padding:5px 12px; border-radius:30px; display:inline-block; }
+
+    /* INFRA (linhas) */
+    .infra-row{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; background:var(--card);
+        padding:14px 18px; border-radius:18px; border:1px solid var(--borda); margin-bottom:14px; transition:.2s; }
+    .infra-row:hover{ border-color:var(--verde); background:var(--card-hover); }
+    .infra-row .nome-item{ font-weight:600; color:var(--verde-neon); min-width:130px; font-size:15px; }
+    .infra-row .campo-mini{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1 1 180px; }
+    .infra-row .campo-mini label{ font-size:13px; font-weight:500; color:var(--texto-suave); }
+    .infra-row .campo-mini input{ width:80px; padding:10px; border:1px solid var(--borda); border-radius:12px;
+        font-size:14px; text-align:center; background:#0A1622; color:#fff; outline:none; }
+    .infra-row .campo-mini input:focus{ border-color:var(--verde-neon); box-shadow:0 0 0 3px rgba(139,195,74,.18); }
+    .infra-row .total-infra{ font-weight:700; color:#06210A; background:var(--grad); padding:4px 16px;
+        border-radius:30px; font-size:15px; min-width:70px; text-align:center; margin-left:auto; }
+    .infra-row .total-infra::before{ content:"R$ "; font-weight:600; font-size:13px; opacity:.75; }
+
+    /* RH (linhas) */
+    .rh-row{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; background:var(--card);
+        padding:14px 18px; border-radius:18px; border:1px solid var(--borda); margin-bottom:14px; transition:.2s; }
+    .rh-row:hover{ border-color:var(--verde); background:var(--card-hover); }
+    .rh-row .nome-item{ font-weight:600; color:var(--verde-neon); min-width:140px; font-size:15px; }
+    .rh-row .campo-mini{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1 1 180px; }
+    .rh-row .campo-mini label{ font-size:13px; font-weight:500; color:var(--texto-suave); }
+    .rh-row .campo-mini input{ width:80px; padding:10px; border:1px solid var(--borda); border-radius:12px;
+        font-size:14px; text-align:center; background:#0A1622; color:#fff; outline:none; }
+    .rh-row .campo-mini input:focus{ border-color:var(--verde-neon); box-shadow:0 0 0 3px rgba(139,195,74,.18); }
+    .rh-row .total-rh{ font-weight:700; color:#06210A; background:var(--grad); padding:4px 16px;
+        border-radius:30px; font-size:15px; min-width:70px; text-align:center; margin-left:auto; }
+    .rh-row .total-rh::before{ content:"R$ "; font-weight:600; font-size:13px; opacity:.75; }
+
+    /* ENCARGOS */
+    .rh-encargos{ margin-top:20px; padding:20px 24px; background:rgba(41,182,246,.06);
+        border-radius:18px; border:1px solid rgba(41,182,246,.25); }
+    .rh-encargos h3{ color:var(--verde-neon); font-size:16px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+    .rh-encargos .encargos-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px 20px; }
+    .rh-encargos .encargo-item{ display:flex; align-items:center; gap:10px; }
+    .rh-encargos .encargo-item label{ font-weight:500; color:var(--texto); font-size:14px; min-width:100px; }
+    .rh-encargos .encargo-item input{ width:100px; padding:8px 12px; border:1px solid var(--borda); border-radius:12px;
+        font-size:14px; text-align:center; background:#0A1622; color:#fff; outline:none; }
+    .rh-encargos .encargo-item input:focus{ border-color:var(--verde-neon); box-shadow:0 0 0 3px rgba(139,195,74,.18); }
+    .rh-encargos .encargo-item span{ color:var(--azul); font-weight:700; }
+    .rh-total-encargos{ margin-top:16px; font-weight:700; font-size:18px; color:var(--verde-neon);
+        text-align:right; padding-top:12px; border-top:2px dashed var(--borda); }
+
+    /* RESUMO FINAL */
+    .resumo-final{ margin-top:40px; padding-top:24px; border-top:2px dashed var(--borda);
+        display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:20px; }
+    .resumo-box{ background:var(--card); padding:14px 28px; border-radius:60px; font-weight:600;
+        font-size:16px; color:var(--texto-suave); border:1px solid var(--borda); }
+    .resumo-box span{ font-weight:800; font-size:20px; color:var(--verde-neon); margin-left:6px; }
+    .btn-zerar{ background:transparent; border:1.5px solid #E57373; padding:12px 28px; border-radius:60px;
+        font-weight:600; color:#E57373; cursor:pointer; transition:.2s; font-size:15px; }
+    .btn-zerar:hover{ background:#E57373; color:#fff; transform:scale(.97); }
+
+    #fileInput{ display:none; }
+
+    /* RESPONSIVO */
+    @media (max-width:700px){
+        .container{ padding:20px 16px; }
+        .header-left h1{ font-size:22px; }
+        .total-geral{ font-size:17px; padding:10px 20px; }
+        .tab-btn{ padding:10px 18px; font-size:13px; }
+        .infra-row,.rh-row{ flex-direction:column; align-items:stretch; }
+        .infra-row .total-infra,.rh-row .total-rh{ margin-left:0; text-align:left; }
+        .resumo-final{ flex-direction:column; align-items:stretch; text-align:center; }
+        .rh-encargos .encargos-grid{ grid-template-columns:1fr; }
+        .rh-encargos .encargo-item{ flex-wrap:wrap; }
+        .header-actions{ width:100%; justify-content:center; }
+        .btn-acao{ flex:1; justify-content:center; font-size:12px; padding:10px 14px; }
+        .dados-filial{ flex-direction:column; align-items:stretch; }
+        .dados-filial .campo{ flex-wrap:wrap; }
+        .dados-filial .campo input{ min-width:100%; }
+        .dados-filial .campo input#numeroFilial{ max-width:100%; }
+        .resumo-rapido{ flex-direction:column; align-items:flex-start; }
+        .card-grid,.pub-grid,.reforma-grid,.eletrica-grid{ grid-template-columns:1fr; }
+    }
+
+    /* IMPRESSÃO */
+    @media print{
+        body{ background:#fff; padding:10px; color:#000; }
+        .container{ box-shadow:none; padding:20px; background:#fff; border:none; }
+        .tab-btn,.header-actions,.btn-zerar{ display:none !important; }
+        .tab-panel{ display:block !important; }
+        .total-geral{ background:#7CB342 !important; color:#06210A !important;
+            -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .tab-panel{ page-break-inside:avoid; }
+        .campo-card,.infra-row,.pub-card,.rh-row,.reforma-card,.eletrica-card{
+            background:#F5F5F5 !important; color:#000 !important; border:1px solid #CCC !important;
+            -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .campo-card label,.pub-card label,.reforma-card label,.eletrica-card label,
+        .infra-row .nome-item,.rh-row .nome-item{ color:#06210A !important; }
+        .campo-card input,.pub-card input,.reforma-card input,.eletrica-card input,
+        .infra-row .campo-mini input,.rh-row .campo-mini input{
+            background:#fff !important; color:#000 !important; border:1px solid #999 !important; }
+        .resumo-box{ background:#F5F5F5 !important; color:#000 !important; border:1px solid #CCC !important;
+            -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .resumo-box span{ color:#4CAF50 !important; }
+        .header-left h1 span{ background:#7CB342 !important; color:#06210A !important;
+            -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .dados-filial,.resumo-rapido{ background:#F5F5F5 !important; border:1px solid #CCC !important;
+            -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .dados-filial .campo label{ color:#06210A !important; }
+        .dados-filial .campo input{ background:#fff !important; color:#000 !important; border:1px solid #999 !important; }
+        .resumo-rapido .item{ color:#555 !important; }
+        .resumo-rapido .item span{ color:#4CAF50 !important; }
+        .rh-encargos{ background:#F5F5F5 !important; border:1px solid #CCC !important; }
+        .rh-encargos h3{ color:#06210A !important; }
+        .rh-encargos .encargo-item label{ color:#000 !important; }
+        .rh-encargos .encargo-item input{ background:#fff !important; color:#000 !important; border:1px solid #999 !important; }
+        .rh-total-encargos{ color:#4CAF50 !important; }
+        .infra-row .total-infra,.rh-row .total-rh{ background:#7CB342 !important; color:#06210A !important;
+            -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        #print-title{ display:block !important; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <div class="header-left">
+            <h1>
+                📋 Projeção de Filial
+                <span>nova unidade</span>
+            </h1>
+            <div class="dados-filial">
+                <div class="campo">
+                    <label for="nomeFilial">🏢 Filial:</label>
+                    <input type="text" id="nomeFilial" placeholder="Ex: Filial Centro" value="">
+                </div>
+                <div class="campo">
+                    <label for="numeroFilial">🔢 Nº:</label>
+                    <input type="text" id="numeroFilial" placeholder="Ex: 002" value="">
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-acao btn-imprimir" onclick="imprimirOrcamento()">🖨️ Imprimir</button>
+            <button class="btn-acao btn-salvar" onclick="salvarOrcamento()">💾 Salvar</button>
+            <button class="btn-acao btn-carregar" onclick="document.getElementById('fileInput').click()">📂 Carregar</button>
+            <input type="file" id="fileInput" accept=".json" onchange="carregarOrcamento(event)">
+        </div>
+        <div class="total-geral" id="totalGeralDisplay">
+            <small>💸 TOTAL GERAL</small> R$ 0,00
+        </div>
+    </div>
+
+    <!-- RESUMO RÁPIDO -->
+    <div class="resumo-rapido" id="resumoRapido">
+        <div class="item">📂 Filial: <span id="resumoNome">-</span></div>
+        <div class="item">🔢 Nº: <span id="resumoNumero">-</span></div>
+        <div class="item">📅 Data: <span id="resumoData">-</span></div>
+    </div>
+
+    <!-- ABAS -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="despesas">📂 Despesas Fixas</button>
+        <button class="tab-btn" data-tab="infra">🖥️ Infraestrutura</button>
+        <button class="tab-btn" data-tab="publicidade">📢 Publicidade</button>
+        <button class="tab-btn" data-tab="rh">👥 Recursos Humanos</button>
+        <button class="tab-btn" data-tab="reforma">🔨 Reforma</button>
+        <button class="tab-btn" data-tab="eletrica">⚡ Elétrica</button>
+    </div>
+
+    <div class="tab-panel active" id="panel-despesas">
+        <div class="card-grid" id="despesasContainer"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-infra">
+        <div id="infraContainer"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-publicidade">
+        <div class="pub-grid" id="publicidadeContainer"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-rh">
+        <div id="rhContainer"></div>
+        <div class="rh-encargos" id="encargosContainer">
+            <h3>📋 Encargos e Benefícios (percentuais sobre a folha)</h3>
+            <div class="encargos-grid" id="encargosGrid"></div>
+            <div class="rh-total-encargos" id="totalEncargosDisplay">Total Encargos: R$ 0,00</div>
+        </div>
+    </div>
+
+    <div class="tab-panel" id="panel-reforma">
+        <div class="reforma-grid" id="reformaContainer"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-eletrica">
+        <div class="eletrica-grid" id="eletricaContainer"></div>
+    </div>
+
+    <div class="resumo-final">
+        <div class="resumo-box">🏷️ Despesas Fixas: <span id="totalDespesasFixas">R$ 0,00</span></div>
+        <div class="resumo-box">🛠️ Infraestrutura: <span id="totalInfra">R$ 0,00</span></div>
+        <div class="resumo-box">📢 Publicidade: <span id="totalPublicidade">R$ 0,00</span></div>
+        <div class="resumo-box">👥 RH Total: <span id="totalRH">R$ 0,00</span></div>
+        <div class="resumo-box">🔨 Reforma: <span id="totalReforma">R$ 0,00</span></div>
+        <div class="resumo-box">⚡ Elétrica: <span id="totalEletrica">R$ 0,00</span></div>
+        <button class="btn-zerar" id="btnZerar">🔄 Zerar todos os valores</button>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        const despesasFixasConfig = [
+            { id: 'aluguel', label: 'Aluguel', placeholder: 'Valor mensal' },
+            { id: 'energia', label: 'Energia', placeholder: 'Valor mensal' },
+            { id: 'internet', label: 'Internet', placeholder: 'Valor mensal' },
+            { id: 'agua', label: 'Água', placeholder: 'Valor mensal' },
+            { id: 'material', label: 'Material de expediente', placeholder: 'Valor mensal' },
+            { id: 'impressora', label: 'Aluguel de impressora', placeholder: 'Valor mensal' },
+            { id: 'sistema', label: 'Sistema de ensino', placeholder: 'Valor mensal' },
+        ];
+
+        const infraConfig = [
+            { id: 'computadores', label: 'Computadores', temQuantidade: true },
+            { id: 'bebedouro', label: 'Bebedouro', temQuantidade: false },
+            { id: 'centralAr', label: 'Central de ar', temQuantidade: true },
+            { id: 'balcao', label: 'Balcão', temQuantidade: true },
+            { id: 'cadeira', label: 'Cadeira', temQuantidade: true },
+            { id: 'mesaRecepcao', label: 'Mesa recepção', temQuantidade: false },
+            { id: 'mesaImpressora', label: 'Mesa para impressora', temQuantidade: false },
+            { id: 'fachada', label: 'Fachada', temQuantidade: true },
+        ];
+
+        const publicidadeConfig = [
+            { id: 'folder', label: 'Folder', placeholder: 'Valor' },
+            { id: 'anuncioRadios', label: 'Anúncio em rádios', placeholder: 'Valor' },
+            { id: 'carroSom', label: 'Carro de som', placeholder: 'Valor' },
+        ];
+
+        const rhConfig = [
+            { id: 'professores', label: 'Professores' },
+            { id: 'coordenador', label: 'Coordenador Pedagógico' },
+            { id: 'recepcionista', label: 'Recepcionista' },
+            { id: 'auxiliarLimpeza', label: 'Auxiliar de Limpeza' },
+            { id: 'estagiario', label: 'Estagiário' },
+        ];
+
+        const encargosConfig = [
+            { id: 'inss', label: 'INSS', default: 20 },
+            { id: 'fgts', label: 'FGTS', default: 8 },
+            { id: 'valeTransporte', label: 'Vale Transporte', default: 6 },
+            { id: 'valeAlimentacao', label: 'Vale Alimentação', default: 10 },
+            { id: 'decimoTerceiro', label: '13º Salário (pró-rata)', default: 8.33 },
+            { id: 'ferias', label: 'Férias (pró-rata)', default: 11.11 },
+        ];
+
+        const reformaConfig = [
+            { id: 'pintura', label: 'Pintura', placeholder: 'Valor' },
+            { id: 'piso', label: 'Piso / Revestimento', placeholder: 'Valor' },
+            { id: 'forro', label: 'Forro / Gesso', placeholder: 'Valor' },
+            { id: 'divisorias', label: 'Divisórias / Drywall', placeholder: 'Valor' },
+            { id: 'marcenaria', label: 'Marcenaria / Móveis planejados', placeholder: 'Valor' },
+            { id: 'banheiro', label: 'Reforma do banheiro', placeholder: 'Valor' },
+            { id: 'fachadaReforma', label: 'Fachada / Letreiro', placeholder: 'Valor' },
+            { id: 'projeto', label: 'Projeto arquitetônico', placeholder: 'Valor' },
+        ];
+
+        const eletricaConfig = [
+            { id: 'quadroGeral', label: 'Quadro geral / Disjuntores', placeholder: 'Valor' },
+            { id: 'fiacao', label: 'Fiação / Cabos', placeholder: 'Valor' },
+            { id: 'tomadas', label: 'Tomadas / Interruptores', placeholder: 'Valor' },
+            { id: 'iluminacao', label: 'Iluminação / Luminárias', placeholder: 'Valor' },
+            { id: 'lampadas', label: 'Lâmpadas (LED)', placeholder: 'Valor' },
+            { id: 'arCondicionado', label: 'Ar condicionado (instalação)', placeholder: 'Valor' },
+            { id: 'noBreak', label: 'No-break / Estabilizador', placeholder: 'Valor' },
+            { id: 'extensao', label: 'Extensões / Benjamins', placeholder: 'Valor' },
+        ];
+
+        const despesasContainer = document.getElementById('despesasContainer');
+        const infraContainer = document.getElementById('infraContainer');
+        const publicidadeContainer = document.getElementById('publicidadeContainer');
+        const rhContainer = document.getElementById('rhContainer');
+        const encargosGrid = document.getElementById('encargosGrid');
+        const totalEncargosDisplay = document.getElementById('totalEncargosDisplay');
+        const reformaContainer = document.getElementById('reformaContainer');
+        const eletricaContainer = document.getElementById('eletricaContainer');
+
+        const totalGeralDisplay = document.getElementById('totalGeralDisplay');
+        const totalDespesasFixasEl = document.getElementById('totalDespesasFixas');
+        const totalInfraEl = document.getElementById('totalInfra');
+        const totalPublicidadeEl = document.getElementById('totalPublicidade');
+        const totalRHEl = document.getElementById('totalRH');
+        const totalReformaEl = document.getElementById('totalReforma');
+        const totalEletricaEl = document.getElementById('totalEletrica');
+        const btnZerar = document.getElementById('btnZerar');
+
+        const nomeFilialInput = document.getElementById('nomeFilial');
+        const numeroFilialInput = document.getElementById('numeroFilial');
+        const resumoNome = document.getElementById('resumoNome');
+        const resumoNumero = document.getElementById('resumoNumero');
+        const resumoData = document.getElementById('resumoData');
+
+        function renderDespesas() {
+            despesasContainer.innerHTML = '';
+            despesasFixasConfig.forEach(cfg => {
+                const card = document.createElement('div');
+                card.className = 'campo-card';
+                const label = document.createElement('label');
+                label.setAttribute('for', `desp_${cfg.id}`);
+                label.textContent = cfg.label;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `desp_${cfg.id}`;
+                input.placeholder = cfg.placeholder || '0,00';
+                input.step = '0.01';
+                input.min = '0';
+                input.value = '0';
+                input.addEventListener('input', atualizarTotais);
+                card.appendChild(label);
+                card.appendChild(input);
+                despesasContainer.appendChild(card);
+            });
+        }
+
+        function renderInfra() {
+            infraContainer.innerHTML = '';
+            infraConfig.forEach(cfg => {
+                const row = document.createElement('div');
+                row.className = 'infra-row';
+                const nomeSpan = document.createElement('span');
+                nomeSpan.className = 'nome-item';
+                nomeSpan.textContent = cfg.label;
+                const mini = document.createElement('div');
+                mini.className = 'campo-mini';
+
+                if (cfg.temQuantidade) {
+                    const labelQtd = document.createElement('label');
+                    labelQtd.textContent = 'Qtd:';
+                    const inputQtd = document.createElement('input');
+                    inputQtd.type = 'number';
+                    inputQtd.id = `infra_${cfg.id}_qtd`;
+                    inputQtd.value = '0';
+                    inputQtd.min = '0';
+                    inputQtd.step = '1';
+                    inputQtd.style.width = '70px';
+
+                    const labelValor = document.createElement('label');
+                    labelValor.textContent = 'R$:';
+                    const inputValor = document.createElement('input');
+                    inputValor.type = 'number';
+                    inputValor.id = `infra_${cfg.id}_valor`;
+                    inputValor.value = '0';
+                    inputValor.min = '0';
+                    inputValor.step = '0.01';
+                    inputValor.style.width = '90px';
+
+                    const totalSpan = document.createElement('span');
+                    totalSpan.className = 'total-infra';
+                    totalSpan.id = `total_infra_${cfg.id}`;
+                    totalSpan.textContent = '0,00';
+
+                    const update = () => {
+                        const qtd = parseFloat(document.getElementById(`infra_${cfg.id}_qtd`).value) || 0;
+                        const valor = parseFloat(document.getElementById(`infra_${cfg.id}_valor`).value) || 0;
+                        const total = qtd * valor;
+                        const totalSpanEl = document.getElementById(`total_infra_${cfg.id}`);
+                        if (totalSpanEl) totalSpanEl.textContent = total.toFixed(2).replace('.', ',');
+                        atualizarTotais();
+                    };
+
+                    inputQtd.addEventListener('input', update);
+                    inputValor.addEventListener('input', update);
+
+                    mini.appendChild(labelQtd);
+                    mini.appendChild(inputQtd);
+                    mini.appendChild(labelValor);
+                    mini.appendChild(inputValor);
+
+                    row.appendChild(nomeSpan);
+                    row.appendChild(mini);
+                    row.appendChild(totalSpan);
+                } else {
+                    const labelValor = document.createElement('label');
+                    labelValor.textContent = 'R$:';
+                    const inputValor = document.createElement('input');
+                    inputValor.type = 'number';
+                    inputValor.id = `infra_${cfg.id}_valor`;
+                    inputValor.value = '0';
+                    inputValor.min = '0';
+                    inputValor.step = '0.01';
+                    inputValor.style.width = '120px';
+
+                    const totalSpan = document.createElement('span');
+                    totalSpan.className = 'total-infra';
+                    totalSpan.id = `total_infra_${cfg.id}`;
+                    totalSpan.textContent = '0,00';
+
+                    const update = () => {
+                        const valor = parseFloat(document.getElementById(`infra_${cfg.id}_valor`).value) || 0;
+                        const totalSpanEl = document.getElementById(`total_infra_${cfg.id}`);
+                        if (totalSpanEl) totalSpanEl.textContent = valor.toFixed(2).replace('.', ',');
+                        atualizarTotais();
+                    };
+
+                    inputValor.addEventListener('input', update);
+
+                    mini.appendChild(labelValor);
+                    mini.appendChild(inputValor);
+
+                    row.appendChild(nomeSpan);
+                    row.appendChild(mini);
+                    row.appendChild(totalSpan);
+                }
+                infraContainer.appendChild(row);
+            });
+        }
+
+        function renderPublicidade() {
+            publicidadeContainer.innerHTML = '';
+            publicidadeConfig.forEach(cfg => {
+                const card = document.createElement('div');
+                card.className = 'pub-card';
+                const label = document.createElement('label');
+                label.setAttribute('for', `pub_${cfg.id}`);
+                label.textContent = cfg.label;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `pub_${cfg.id}`;
+                input.placeholder = cfg.placeholder || '0,00';
+                input.step = '0.01';
+                input.min = '0';
+                input.value = '0';
+                input.addEventListener('input', atualizarTotais);
+                card.appendChild(label);
+                card.appendChild(input);
+                publicidadeContainer.appendChild(card);
+            });
+        }
+
+        function renderRH() {
+            rhContainer.innerHTML = '';
+            rhConfig.forEach(cfg => {
+                const row = document.createElement('div');
+                row.className = 'rh-row';
+                const nomeSpan = document.createElement('span');
+                nomeSpan.className = 'nome-item';
+                nomeSpan.textContent = cfg.label;
+                const mini = document.createElement('div');
+                mini.className = 'campo-mini';
+
+                const labelQtd = document.createElement('label');
+                labelQtd.textContent = 'Qtd:';
+                const inputQtd = document.createElement('input');
+                inputQtd.type = 'number';
+                inputQtd.id = `rh_${cfg.id}_qtd`;
+                inputQtd.value = '0';
+                inputQtd.min = '0';
+                inputQtd.step = '1';
+                inputQtd.style.width = '70px';
+
+                const labelSalario = document.createElement('label');
+                labelSalario.textContent = 'Salário R$:';
+                const inputSalario = document.createElement('input');
+                inputSalario.type = 'number';
+                inputSalario.id = `rh_${cfg.id}_salario`;
+                inputSalario.value = '0';
+                inputSalario.min = '0';
+                inputSalario.step = '0.01';
+                inputSalario.style.width = '100px';
+
+                const totalSpan = document.createElement('span');
+                totalSpan.className = 'total-rh';
+                totalSpan.id = `total_rh_${cfg.id}`;
+                totalSpan.textContent = '0,00';
+
+                const update = () => {
+                    const qtd = parseFloat(document.getElementById(`rh_${cfg.id}_qtd`).value) || 0;
+                    const salario = parseFloat(document.getElementById(`rh_${cfg.id}_salario`).value) || 0;
+                    const total = qtd * salario;
+                    const totalSpanEl = document.getElementById(`total_rh_${cfg.id}`);
+                    if (totalSpanEl) totalSpanEl.textContent = total.toFixed(2).replace('.', ',');
+                    atualizarTotais();
+                };
+
+                inputQtd.addEventListener('input', update);
+                inputSalario.addEventListener('input', update);
+
+                mini.appendChild(labelQtd);
+                mini.appendChild(inputQtd);
+                mini.appendChild(labelSalario);
+                mini.appendChild(inputSalario);
+
+                row.appendChild(nomeSpan);
+                row.appendChild(mini);
+                row.appendChild(totalSpan);
+                rhContainer.appendChild(row);
+            });
+        }
+
+        function renderEncargos() {
+            encargosGrid.innerHTML = '';
+            encargosConfig.forEach(cfg => {
+                const div = document.createElement('div');
+                div.className = 'encargo-item';
+                const label = document.createElement('label');
+                label.setAttribute('for', `enc_${cfg.id}`);
+                label.textContent = cfg.label;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `enc_${cfg.id}`;
+                input.value = cfg.default;
+                input.min = '0';
+                input.max = '100';
+                input.step = '0.01';
+                input.style.width = '80px';
+                const span = document.createElement('span');
+                span.textContent = '%';
+                input.addEventListener('input', atualizarTotais);
+                div.appendChild(label);
+                div.appendChild(input);
+                div.appendChild(span);
+                encargosGrid.appendChild(div);
+            });
+        }
+
+        function renderReforma() {
+            reformaContainer.innerHTML = '';
+            reformaConfig.forEach(cfg => {
+                const card = document.createElement('div');
+                card.className = 'reforma-card';
+                const label = document.createElement('label');
+                label.setAttribute('for', `ref_${cfg.id}`);
+                label.textContent = cfg.label;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `ref_${cfg.id}`;
+                input.placeholder = cfg.placeholder || '0,00';
+                input.step = '0.01';
+                input.min = '0';
+                input.value = '0';
+                input.addEventListener('input', atualizarTotais);
+                card.appendChild(label);
+                card.appendChild(input);
+                reformaContainer.appendChild(card);
+            });
+        }
+
+        function renderEletrica() {
+            eletricaContainer.innerHTML = '';
+            eletricaConfig.forEach(cfg => {
+                const card = document.createElement('div');
+                card.className = 'eletrica-card';
+                const label = document.createElement('label');
+                label.setAttribute('for', `ele_${cfg.id}`);
+                label.textContent = cfg.label;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `ele_${cfg.id}`;
+                input.placeholder = cfg.placeholder || '0,00';
+                input.step = '0.01';
+                input.min = '0';
+                input.value = '0';
+                input.addEventListener('input', atualizarTotais);
+                card.appendChild(label);
+                card.appendChild(input);
+                eletricaContainer.appendChild(card);
+            });
+        }
+
+        function atualizarResumo() {
+            const nome = nomeFilialInput.value.trim() || '-';
+            const numero = numeroFilialInput.value.trim() || '-';
+            const data = new Date().toLocaleDateString('pt-BR');
+            resumoNome.textContent = nome;
+            resumoNumero.textContent = numero;
+            resumoData.textContent = data;
+        }
+
+        function calcularTotais() {
+            let totalDespesas = 0;
+            despesasFixasConfig.forEach(cfg => {
+                const input = document.getElementById(`desp_${cfg.id}`);
+                if (input) totalDespesas += parseFloat(input.value) || 0;
+            });
+
+            let totalInfra = 0;
+            infraConfig.forEach(cfg => {
+                const totalSpan = document.getElementById(`total_infra_${cfg.id}`);
+                if (totalSpan) {
+                    const txt = totalSpan.textContent.trim().replace('.', '').replace(',', '.');
+                    totalInfra += parseFloat(txt) || 0;
+                }
+            });
+
+            let totalPublicidade = 0;
+            publicidadeConfig.forEach(cfg => {
+                const input = document.getElementById(`pub_${cfg.id}`);
+                if (input) totalPublicidade += parseFloat(input.value) || 0;
+            });
+
+            let totalFolha = 0;
+            rhConfig.forEach(cfg => {
+                const totalSpan = document.getElementById(`total_rh_${cfg.id}`);
+                if (totalSpan) {
+                    const txt = totalSpan.textContent.trim().replace('.', '').replace(',', '.');
+                    totalFolha += parseFloat(txt) || 0;
+                }
+            });
+
+            let totalEncargos = 0;
+            encargosConfig.forEach(cfg => {
+                const input = document.getElementById(`enc_${cfg.id}`);
+                if (input) {
+                    const val = parseFloat(input.value) || 0;
+                    totalEncargos += (totalFolha * val) / 100;
+                }
+            });
+
+            const totalRH = totalFolha + totalEncargos;
+
+            let totalReforma = 0;
+            reformaConfig.forEach(cfg => {
+                const input = document.getElementById(`ref_${cfg.id}`);
+                if (input) totalReforma += parseFloat(input.value) || 0;
+            });
+
+            let totalEletrica = 0;
+            eletricaConfig.forEach(cfg => {
+                const input = document.getElementById(`ele_${cfg.id}`);
+                if (input) totalEletrica += parseFloat(input.value) || 0;
+            });
+
+            return { totalDespesas, totalInfra, totalPublicidade, totalRH, totalFolha, totalEncargos, totalReforma, totalEletrica };
+        }
+
+        function atualizarTotais() {
+            const { totalDespesas, totalInfra, totalPublicidade, totalRH, totalFolha, totalEncargos, totalReforma, totalEletrica } = calcularTotais();
+            const totalGeral = totalDespesas + totalInfra + totalPublicidade + totalRH + totalReforma + totalEletrica;
+            const fmt = (v) => 'R$ ' + v.toFixed(2).replace('.', ',');
+
+            totalDespesasFixasEl.textContent = fmt(totalDespesas);
+            totalInfraEl.textContent = fmt(totalInfra);
+            totalPublicidadeEl.textContent = fmt(totalPublicidade);
+            totalRHEl.textContent = fmt(totalRH);
+            totalReformaEl.textContent = fmt(totalReforma);
+            totalEletricaEl.textContent = fmt(totalEletrica);
+            totalGeralDisplay.innerHTML = `<small>💸 TOTAL GERAL</small> ${fmt(totalGeral)}`;
+
+            if (totalEncargosDisplay) {
+                totalEncargosDisplay.textContent = `Total Encargos: ${fmt(totalEncargos)} (Folha: ${fmt(totalFolha)} + Encargos)`;
+            }
+
+            atualizarResumo();
+        }
+
+        function zerarTodos() {
+            despesasFixasConfig.forEach(cfg => {
+                const input = document.getElementById(`desp_${cfg.id}`);
+                if (input) input.value = '0';
+            });
+
+            infraConfig.forEach(cfg => {
+                const qtdInput = document.getElementById(`infra_${cfg.id}_qtd`);
+                if (qtdInput) qtdInput.value = '0';
+                const valorInput = document.getElementById(`infra_${cfg.id}_valor`);
+                if (valorInput) valorInput.value = '0';
+                const event = new Event('input');
+                if (qtdInput) qtdInput.dispatchEvent(event);
+                else if (valorInput) valorInput.dispatchEvent(event);
+            });
+
+            publicidadeConfig.forEach(cfg => {
+                const input = document.getElementById(`pub_${cfg.id}`);
+                if (input) input.value = '0';
+            });
+
+            rhConfig.forEach(cfg => {
+                const qtdInput = document.getElementById(`rh_${cfg.id}_qtd`);
+                if (qtdInput) qtdInput.value = '0';
+                const salarioInput = document.getElementById(`rh_${cfg.id}_salario`);
+                if (salarioInput) salarioInput.value = '0';
+                const event = new Event('input');
+                if (qtdInput) qtdInput.dispatchEvent(event);
+                else if (salarioInput) salarioInput.dispatchEvent(event);
+            });
+
+            encargosConfig.forEach(cfg => {
+                const input = document.getElementById(`enc_${cfg.id}`);
+                if (input) input.value = cfg.default;
+            });
+
+            reformaConfig.forEach(cfg => {
+                const input = document.getElementById(`ref_${cfg.id}`);
+                if (input) input.value = '0';
+            });
+
+            eletricaConfig.forEach(cfg => {
+                const input = document.getElementById(`ele_${cfg.id}`);
+                if (input) input.value = '0';
+            });
+
+            nomeFilialInput.value = '';
+            numeroFilialInput.value = '';
+            atualizarTotais();
+        }
+
+        window.imprimirOrcamento = function() {
+            const titulo = document.createElement('div');
+            titulo.style.cssText = 'text-align:center; font-size:24px; font-weight:700; color:#0b2b4a; margin-bottom:20px; display:none;';
+            titulo.id = 'print-title';
+            const nome = nomeFilialInput.value.trim() || 'Filial';
+            const numero = numeroFilialInput.value.trim() || 'Nº não informado';
+            titulo.innerHTML = `📋 ORÇAMENTO - ${nome} (${numero})<br><small style="font-size:14px; font-weight:400; color:#1a5f7a;">Gerado em: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</small>`;
+            document.querySelector('.container').insertBefore(titulo, document.querySelector('.header'));
+
+            const style = document.createElement('style');
+            style.textContent = '@media print { #print-title { display: block !important; } }';
+            document.head.appendChild(style);
+
+            window.print();
+
+            setTimeout(() => {
+                if (titulo.parentNode) titulo.remove();
+                if (style.parentNode) style.remove();
+            }, 1000);
+        };
+
+        window.salvarOrcamento = function() {
+            const dados = {
+                versao: '1.0',
+                data: new Date().toISOString(),
+                filial: {
+                    nome: nomeFilialInput.value.trim(),
+                    numero: numeroFilialInput.value.trim()
+                },
+                despesas: {}, infra: {}, publicidade: {}, rh: {},
+                encargos: {}, reforma: {}, eletrica: {}
+            };
+
+            despesasFixasConfig.forEach(cfg => {
+                const input = document.getElementById(`desp_${cfg.id}`);
+                dados.despesas[cfg.id] = input ? parseFloat(input.value) || 0 : 0;
+            });
+            infraConfig.forEach(cfg => {
+                const qtdInput = document.getElementById(`infra_${cfg.id}_qtd`);
+                const valorInput = document.getElementById(`infra_${cfg.id}_valor`);
+                dados.infra[cfg.id] = {
+                    quantidade: qtdInput ? parseFloat(qtdInput.value) || 0 : 0,
+                    valor: valorInput ? parseFloat(valorInput.value) || 0 : 0
+                };
+            });
+            publicidadeConfig.forEach(cfg => {
+                const input = document.getElementById(`pub_${cfg.id}`);
+                dados.publicidade[cfg.id] = input ? parseFloat(input.value) || 0 : 0;
+            });
+            rhConfig.forEach(cfg => {
+                const qtdInput = document.getElementById(`rh_${cfg.id}_qtd`);
+                const salarioInput = document.getElementById(`rh_${cfg.id}_salario`);
+                dados.rh[cfg.id] = {
+                    quantidade: qtdInput ? parseFloat(qtdInput.value) || 0 : 0,
+                    salario: salarioInput ? parseFloat(salarioInput.value) || 0 : 0
+                };
+            });
+            encargosConfig.forEach(cfg => {
+                const input = document.getElementById(`enc_${cfg.id}`);
+                dados.encargos[cfg.id] = input ? parseFloat(input.value) || 0 : 0;
+            });
+            reformaConfig.forEach(cfg => {
+                const input = document.getElementById(`ref_${cfg.id}`);
+                dados.reforma[cfg.id] = input ? parseFloat(input.value) || 0 : 0;
+            });
+            eletricaConfig.forEach(cfg => {
+                const input = document.getElementById(`ele_${cfg.id}`);
+                dados.eletrica[cfg.id] = input ? parseFloat(input.value) || 0 : 0;
+            });
+
+            const nome = dados.filial.nome || 'filial';
+            const numero = dados.filial.numero || '00';
+            const json = JSON.stringify(dados, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `orcamento_${nome}_${numero}_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        window.carregarOrcamento = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    if (dados.filial) {
+                        if (dados.filial.nome !== undefined) nomeFilialInput.value = dados.filial.nome;
+                        if (dados.filial.numero !== undefined) numeroFilialInput.value = dados.filial.numero;
+                    }
+                    if (dados.despesas) {
+                        despesasFixasConfig.forEach(cfg => {
+                            const input = document.getElementById(`desp_${cfg.id}`);
+                            if (input && dados.despesas[cfg.id] !== undefined) input.value = dados.despesas[cfg.id];
+                        });
+                    }
+                    if (dados.infra) {
+                        infraConfig.forEach(cfg => {
+                            const qtdInput = document.getElementById(`infra_${cfg.id}_qtd`);
+                            const valorInput = document.getElementById(`infra_${cfg.id}_valor`);
+                            if (qtdInput && dados.infra[cfg.id] && dados.infra[cfg.id].quantidade !== undefined) qtdInput.value = dados.infra[cfg.id].quantidade;
+                            if (valorInput && dados.infra[cfg.id] && dados.infra[cfg.id].valor !== undefined) valorInput.value = dados.infra[cfg.id].valor;
+                            if (qtdInput) qtdInput.dispatchEvent(new Event('input'));
+                            if (valorInput) valorInput.dispatchEvent(new Event('input'));
+                        });
+                    }
+                    if (dados.publicidade) {
+                        publicidadeConfig.forEach(cfg => {
+                            const input = document.getElementById(`pub_${cfg.id}`);
+                            if (input && dados.publicidade[cfg.id] !== undefined) input.value = dados.publicidade[cfg.id];
+                        });
+                    }
+                    if (dados.rh) {
+                        rhConfig.forEach(cfg => {
+                            const qtdInput = document.getElementById(`rh_${cfg.id}_qtd`);
+                            const salarioInput = document.getElementById(`rh_${cfg.id}_salario`);
+                            if (qtdInput && dados.rh[cfg.id] && dados.rh[cfg.id].quantidade !== undefined) qtdInput.value = dados.rh[cfg.id].quantidade;
+                            if (salarioInput && dados.rh[cfg.id] && dados.rh[cfg.id].salario !== undefined) salarioInput.value = dados.rh[cfg.id].salario;
+                            if (qtdInput) qtdInput.dispatchEvent(new Event('input'));
+                            if (salarioInput) salarioInput.dispatchEvent(new Event('input'));
+                        });
+                    }
+                    if (dados.encargos) {
+                        encargosConfig.forEach(cfg => {
+                            const input = document.getElementById(`enc_${cfg.id}`);
+                            if (input && dados.encargos[cfg.id] !== undefined) input.value = dados.encargos[cfg.id];
+                        });
+                    }
+                    if (dados.reforma) {
+                        reformaConfig.forEach(cfg => {
+                            const input = document.getElementById(`ref_${cfg.id}`);
+                            if (input && dados.reforma[cfg.id] !== undefined) input.value = dados.reforma[cfg.id];
+                        });
+                    }
+                    if (dados.eletrica) {
+                        eletricaConfig.forEach(cfg => {
+                            const input = document.getElementById(`ele_${cfg.id}`);
+                            if (input && dados.eletrica[cfg.id] !== undefined) input.value = dados.eletrica[cfg.id];
+                        });
+                    }
+                    atualizarTotais();
+                    alert('✅ Orçamento carregado com sucesso!');
+                } catch (err) {
+                    alert('❌ Erro ao carregar o arquivo. Verifique se é um arquivo válido.');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        };
+
+        function setupTabs() {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const panels = {
+                despesas: document.getElementById('panel-despesas'),
+                infra: document.getElementById('panel-infra'),
+                publicidade: document.getElementById('panel-publicidade'),
+                rh: document.getElementById('panel-rh'),
+                reforma: document.getElementById('panel-reforma'),
+                eletrica: document.getElementById('panel-eletrica')
+            };
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const tab = this.dataset.tab;
+                    Object.keys(panels).forEach(key => {
+                        panels[key].classList.toggle('active', key === tab);
+                    });
+                });
+            });
+        }
+
+        function init() {
+            renderDespesas();
+            renderInfra();
+            renderPublicidade();
+            renderRH();
+            renderEncargos();
+            renderReforma();
+            renderEletrica();
+            setupTabs();
+            nomeFilialInput.addEventListener('input', atualizarResumo);
+            numeroFilialInput.addEventListener('input', atualizarResumo);
+            atualizarTotais();
+            btnZerar.addEventListener('click', zerarTodos);
+            setTimeout(atualizarTotais, 50);
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
